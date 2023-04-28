@@ -1,0 +1,90 @@
+﻿@using OrderItemsWeb.Models;
+
+@{
+	ViewBag.Title = "Index";
+}
+
+<h2>Your Order Receipt</h2>
+
+@if (Session["Cart"] == null)
+{
+	<p>Your cart has nothing</p>
+	@Html.ActionLink("Continuing Order?", "Index", "Products", null, new { @class = "btn btn-primary" })
+}
+else
+{
+	<div class="form-group">
+		<label for="agents">Agent</label>
+		@Html.DropDownList("AgentName", new SelectList(ViewBag.Agents, "AgentID", "AgentName"), new { @class = "form-control", id = "agents" })
+	</div>
+	using (Html.BeginForm("UpdateOrder", "OrderCart", FormMethod.Post))
+	{
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>
+						Product Name
+					</th>
+					<th>
+						Product Quantity
+					</th>
+					<th>
+						Product Price
+					</th>
+					<th>Sub Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var cart in (List<Cart>)Session["Cart"])
+				{
+					<tr>
+						<td>
+							@cart.Product.ProductName
+						</td>
+						<td>
+							<input type="text" class="form-control" name="quantity" id="quantity" value="@cart.Quantity" onkeypress="return checkNumber(event, '@cart.Product.ProductID')"><span id="error-message-@cart.Product.ProductID" class="text-danger"></span>
+						</td>
+						<td>
+							@String.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:c}", @cart.Product.ProductPrice)
+						</td>
+						<td>
+							@String.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:c}", @cart.Product.ProductPrice * cart.Quantity)
+						</td>
+						<td>
+							@Html.ActionLink("Delete", "Delete", "OrderCart", new { id = cart.Product.ProductID }, new { @class = "btn btn-danger", onclick = "return confirm('Are you sure you want to delete this?')" })
+						</td>
+					</tr>
+				}
+
+				<tr class="success">
+					<td colspan="3"><b>Total price:</b></td>
+					<td>
+						@{
+							List<Cart> carts = (List<Cart>)Session["Cart"];
+							var totalPrice = String.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:c}", carts.Sum(x => x.Quantity * x.Product.ProductPrice));
+						}
+
+						<b>@totalPrice</b>
+					</td>
+				</tr>
+
+				<tr class="info">
+					<td colspan="3"><b>Total quantity:</b></td>
+					<td>
+						@{
+							var totalQuantity = carts.Sum(x => x.Quantity);
+						}
+
+						<b>@totalQuantity</b>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		@Html.ActionLink("Continuing Order?", "Index", "Products", null, new { @class = "btn btn-primary" })
+		<button type="submit" class="btn btn-success">Update Order</button>
+		<span>|||</span>
+		<button type="button" class="btn btn-warning cash">Cash</button>
+		<button type="button" class="btn btn-info transfer">Transfer</button>
+		<button type="button" class="btn btn-purple momo">Momo</button>
+	}
+}

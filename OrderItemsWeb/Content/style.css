@@ -1,0 +1,8 @@
+﻿.table > tbody > tr > td {
+	vertical-align: middle;
+}
+
+.btn-purple {
+	background-color: #b24182;
+	color: white;
+}

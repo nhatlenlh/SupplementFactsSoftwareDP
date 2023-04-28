@@ -1,0 +1,436 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="SupplementFactsManagementModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Agent">
+          <Key>
+            <PropertyRef Name="AgentID" />
+          </Key>
+          <Property Name="AgentID" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="AgentName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="IncludeImportedProducts">
+          <Key>
+            <PropertyRef Name="ReceiptID" />
+            <PropertyRef Name="ProductID" />
+          </Key>
+          <Property Name="TotalProductQuantity" Type="int" Nullable="false" />
+          <Property Name="TotalProductPrice" Type="int" Nullable="false" />
+          <Property Name="ReceiptID" Type="int" Nullable="false" />
+          <Property Name="ProductID" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="IncludeOrderProducts">
+          <Key>
+            <PropertyRef Name="OrderID" />
+            <PropertyRef Name="ProductID" />
+          </Key>
+          <Property Name="TotalProductQuantity" Type="int" Nullable="false" />
+          <Property Name="TotalProductPrice" Type="int" Nullable="false" />
+          <Property Name="OrderID" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="ProductID" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="OrderReceipt">
+          <Key>
+            <PropertyRef Name="OrderID" />
+          </Key>
+          <Property Name="OrderID" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="TotalOrderPrice" Type="int" Nullable="false" />
+          <Property Name="TotalOrderQuantity" Type="int" Nullable="false" />
+          <Property Name="OrderedDate" Type="date" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="AgentID" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="ProductID" />
+          </Key>
+          <Property Name="ProductID" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="ProductName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ProductPrice" Type="int" Nullable="false" />
+          <Property Name="ProductQuantity" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="WarehouseReceipt">
+          <Key>
+            <PropertyRef Name="ReceiptID" />
+          </Key>
+          <Property Name="ReceiptID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TotalWarehouseQuantity" Type="int" Nullable="false" />
+          <Property Name="TotalWarehousePrice" Type="int" Nullable="false" />
+          <Property Name="CreatedDate" Type="date" Nullable="false" />
+        </EntityType>
+        <Association Name="FkIncludeImportedProducts_ProductID">
+          <End Role="Product" Type="Self.Product" Multiplicity="1" />
+          <End Role="IncludeImportedProducts" Type="Self.IncludeImportedProducts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="ProductID" />
+            </Principal>
+            <Dependent Role="IncludeImportedProducts">
+              <PropertyRef Name="ProductID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FkIncludeImportedProducts_ReceiptID">
+          <End Role="WarehouseReceipt" Type="Self.WarehouseReceipt" Multiplicity="1" />
+          <End Role="IncludeImportedProducts" Type="Self.IncludeImportedProducts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="WarehouseReceipt">
+              <PropertyRef Name="ReceiptID" />
+            </Principal>
+            <Dependent Role="IncludeImportedProducts">
+              <PropertyRef Name="ReceiptID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FkIncludeOrderProducts_OrderID">
+          <End Role="OrderReceipt" Type="Self.OrderReceipt" Multiplicity="1" />
+          <End Role="IncludeOrderProducts" Type="Self.IncludeOrderProducts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OrderReceipt">
+              <PropertyRef Name="OrderID" />
+            </Principal>
+            <Dependent Role="IncludeOrderProducts">
+              <PropertyRef Name="OrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FkIncludeOrderProducts_ProductID">
+          <End Role="Product" Type="Self.Product" Multiplicity="1" />
+          <End Role="IncludeOrderProducts" Type="Self.IncludeOrderProducts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="ProductID" />
+            </Principal>
+            <Dependent Role="IncludeOrderProducts">
+              <PropertyRef Name="ProductID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FkOrderReceipt_AgentID">
+          <End Role="Agent" Type="Self.Agent" Multiplicity="1" />
+          <End Role="OrderReceipt" Type="Self.OrderReceipt" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Agent">
+              <PropertyRef Name="AgentID" />
+            </Principal>
+            <Dependent Role="OrderReceipt">
+              <PropertyRef Name="AgentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="spIncludeImportedProducts" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="totalProductQuantity" Type="int" Mode="In" />
+          <Parameter Name="totalProductPrice" Type="int" Mode="In" />
+          <Parameter Name="receiptId" Type="int" Mode="In" />
+          <Parameter Name="productId" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="spProductCreate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="productId" Type="varchar" Mode="In" />
+          <Parameter Name="productName" Type="nvarchar" Mode="In" />
+          <Parameter Name="productPrice" Type="int" Mode="In" />
+          <Parameter Name="productQuantity" Type="int" Mode="In" />
+        </Function>
+        <Function Name="spWarehouseReceipt" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="totalWarehouseQuantity" Type="int" Mode="In" />
+          <Parameter Name="totalWarehousePrice" Type="int" Mode="In" />
+          <Parameter Name="createdDate" Type="date" Mode="In" />
+        </Function>
+        <EntityContainer Name="SupplementFactsManagementModelStoreContainer">
+          <EntitySet Name="Agent" EntityType="Self.Agent" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="IncludeImportedProducts" EntityType="Self.IncludeImportedProducts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="IncludeOrderProducts" EntityType="Self.IncludeOrderProducts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="OrderReceipt" EntityType="Self.OrderReceipt" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="WarehouseReceipt" EntityType="Self.WarehouseReceipt" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FkIncludeImportedProducts_ProductID" Association="Self.FkIncludeImportedProducts_ProductID">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="IncludeImportedProducts" EntitySet="IncludeImportedProducts" />
+          </AssociationSet>
+          <AssociationSet Name="FkIncludeImportedProducts_ReceiptID" Association="Self.FkIncludeImportedProducts_ReceiptID">
+            <End Role="WarehouseReceipt" EntitySet="WarehouseReceipt" />
+            <End Role="IncludeImportedProducts" EntitySet="IncludeImportedProducts" />
+          </AssociationSet>
+          <AssociationSet Name="FkIncludeOrderProducts_OrderID" Association="Self.FkIncludeOrderProducts_OrderID">
+            <End Role="OrderReceipt" EntitySet="OrderReceipt" />
+            <End Role="IncludeOrderProducts" EntitySet="IncludeOrderProducts" />
+          </AssociationSet>
+          <AssociationSet Name="FkIncludeOrderProducts_ProductID" Association="Self.FkIncludeOrderProducts_ProductID">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="IncludeOrderProducts" EntitySet="IncludeOrderProducts" />
+          </AssociationSet>
+          <AssociationSet Name="FkOrderReceipt_AgentID" Association="Self.FkOrderReceipt_AgentID">
+            <End Role="Agent" EntitySet="Agent" />
+            <End Role="OrderReceipt" EntitySet="OrderReceipt" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SupplementFactsManagementModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="IncludeImportedProduct">
+          <Key>
+            <PropertyRef Name="ReceiptID" />
+            <PropertyRef Name="ProductID" />
+          </Key>
+          <Property Name="TotalProductQuantity" Type="Int32" Nullable="false" />
+          <Property Name="TotalProductPrice" Type="Int32" Nullable="false" />
+          <Property Name="ReceiptID" Type="Int32" Nullable="false" />
+          <Property Name="ProductID" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Product" Relationship="Self.FkIncludeImportedProducts_ProductID" FromRole="IncludeImportedProducts" ToRole="Product" />
+          <NavigationProperty Name="WarehouseReceipt" Relationship="Self.FkIncludeImportedProducts_ReceiptID" FromRole="IncludeImportedProducts" ToRole="WarehouseReceipt" />
+        </EntityType>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="ProductID" />
+          </Key>
+          <Property Name="ProductID" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ProductName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ProductPrice" Type="Int32" Nullable="false" />
+          <Property Name="ProductQuantity" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="IncludeImportedProducts" Relationship="Self.FkIncludeImportedProducts_ProductID" FromRole="Product" ToRole="IncludeImportedProducts" />
+          <NavigationProperty Name="IncludeOrderProducts" Relationship="SupplementFactsManagementModel.FkIncludeOrderProducts_ProductID" FromRole="Product" ToRole="IncludeOrderProduct" />
+        </EntityType>
+        <EntityType Name="WarehouseReceipt">
+          <Key>
+            <PropertyRef Name="ReceiptID" />
+          </Key>
+          <Property Name="ReceiptID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TotalWarehouseQuantity" Type="Int32" Nullable="false" />
+          <Property Name="TotalWarehousePrice" Type="Int32" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="IncludeImportedProducts" Relationship="Self.FkIncludeImportedProducts_ReceiptID" FromRole="WarehouseReceipt" ToRole="IncludeImportedProducts" />
+        </EntityType>
+        <Association Name="FkIncludeImportedProducts_ProductID">
+          <End Role="Product" Type="Self.Product" Multiplicity="1" />
+          <End Role="IncludeImportedProducts" Type="Self.IncludeImportedProduct" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="ProductID" />
+            </Principal>
+            <Dependent Role="IncludeImportedProducts">
+              <PropertyRef Name="ProductID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FkIncludeImportedProducts_ReceiptID">
+          <End Role="WarehouseReceipt" Type="Self.WarehouseReceipt" Multiplicity="1" />
+          <End Role="IncludeImportedProducts" Type="Self.IncludeImportedProduct" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="WarehouseReceipt">
+              <PropertyRef Name="ReceiptID" />
+            </Principal>
+            <Dependent Role="IncludeImportedProducts">
+              <PropertyRef Name="ReceiptID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DevConn" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="IncludeImportedProducts" EntityType="Self.IncludeImportedProduct" />
+          <EntitySet Name="Products" EntityType="Self.Product" />
+          <EntitySet Name="WarehouseReceipts" EntityType="Self.WarehouseReceipt" />
+          <AssociationSet Name="FkIncludeImportedProducts_ProductID" Association="Self.FkIncludeImportedProducts_ProductID">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="IncludeImportedProducts" EntitySet="IncludeImportedProducts" />
+          </AssociationSet>
+          <AssociationSet Name="FkIncludeImportedProducts_ReceiptID" Association="Self.FkIncludeImportedProducts_ReceiptID">
+            <End Role="WarehouseReceipt" EntitySet="WarehouseReceipts" />
+            <End Role="IncludeImportedProducts" EntitySet="IncludeImportedProducts" />
+          </AssociationSet>
+          <FunctionImport Name="spIncludeImportedProducts">
+            <Parameter Name="totalProductQuantity" Mode="In" Type="Int32" />
+            <Parameter Name="totalProductPrice" Mode="In" Type="Int32" />
+            <Parameter Name="receiptId" Mode="In" Type="Int32" />
+            <Parameter Name="productId" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="spProductCreate">
+            <Parameter Name="productId" Mode="In" Type="String" />
+            <Parameter Name="productName" Mode="In" Type="String" />
+            <Parameter Name="productPrice" Mode="In" Type="Int32" />
+            <Parameter Name="productQuantity" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="spWarehouseReceipt" ReturnType="Collection(Decimal)">
+            <Parameter Name="totalWarehouseQuantity" Mode="In" Type="Int32" />
+            <Parameter Name="totalWarehousePrice" Mode="In" Type="Int32" />
+            <Parameter Name="createdDate" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <EntitySet Name="Agents" EntityType="SupplementFactsManagementModel.Agent" />
+          <EntitySet Name="IncludeOrderProducts" EntityType="SupplementFactsManagementModel.IncludeOrderProduct" />
+          <EntitySet Name="OrderReceipts" EntityType="SupplementFactsManagementModel.OrderReceipt" />
+          <AssociationSet Name="FkOrderReceipt_AgentID" Association="SupplementFactsManagementModel.FkOrderReceipt_AgentID">
+            <End Role="Agent" EntitySet="Agents" />
+            <End Role="OrderReceipt" EntitySet="OrderReceipts" />
+          </AssociationSet>
+          <AssociationSet Name="FkIncludeOrderProducts_OrderID" Association="SupplementFactsManagementModel.FkIncludeOrderProducts_OrderID">
+            <End Role="OrderReceipt" EntitySet="OrderReceipts" />
+            <End Role="IncludeOrderProduct" EntitySet="IncludeOrderProducts" />
+          </AssociationSet>
+          <AssociationSet Name="FkIncludeOrderProducts_ProductID" Association="SupplementFactsManagementModel.FkIncludeOrderProducts_ProductID">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="IncludeOrderProduct" EntitySet="IncludeOrderProducts" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Agent">
+          <Key>
+            <PropertyRef Name="AgentID" />
+          </Key>
+          <Property Name="AgentID" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="AgentName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="OrderReceipts" Relationship="SupplementFactsManagementModel.FkOrderReceipt_AgentID" FromRole="Agent" ToRole="OrderReceipt" />
+        </EntityType>
+        <EntityType Name="IncludeOrderProduct">
+          <Key>
+            <PropertyRef Name="OrderID" />
+            <PropertyRef Name="ProductID" />
+          </Key>
+          <Property Name="TotalProductQuantity" Type="Int32" Nullable="false" />
+          <Property Name="TotalProductPrice" Type="Int32" Nullable="false" />
+          <Property Name="OrderID" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="ProductID" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="OrderReceipt" Relationship="SupplementFactsManagementModel.FkIncludeOrderProducts_OrderID" FromRole="IncludeOrderProduct" ToRole="OrderReceipt" />
+          <NavigationProperty Name="Product" Relationship="SupplementFactsManagementModel.FkIncludeOrderProducts_ProductID" FromRole="IncludeOrderProduct" ToRole="Product" />
+        </EntityType>
+        <EntityType Name="OrderReceipt">
+          <Key>
+            <PropertyRef Name="OrderID" />
+          </Key>
+          <Property Name="OrderID" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="TotalOrderPrice" Type="Int32" Nullable="false" />
+          <Property Name="TotalOrderQuantity" Type="Int32" Nullable="false" />
+          <Property Name="OrderedDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="AgentID" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Agent" Relationship="SupplementFactsManagementModel.FkOrderReceipt_AgentID" FromRole="OrderReceipt" ToRole="Agent" />
+          <NavigationProperty Name="IncludeOrderProducts" Relationship="SupplementFactsManagementModel.FkIncludeOrderProducts_OrderID" FromRole="OrderReceipt" ToRole="IncludeOrderProduct" />
+        </EntityType>
+        <Association Name="FkOrderReceipt_AgentID">
+          <End Type="SupplementFactsManagementModel.Agent" Role="Agent" Multiplicity="1" />
+          <End Type="SupplementFactsManagementModel.OrderReceipt" Role="OrderReceipt" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Agent">
+              <PropertyRef Name="AgentID" />
+            </Principal>
+            <Dependent Role="OrderReceipt">
+              <PropertyRef Name="AgentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FkIncludeOrderProducts_OrderID">
+          <End Type="SupplementFactsManagementModel.OrderReceipt" Role="OrderReceipt" Multiplicity="1" />
+          <End Type="SupplementFactsManagementModel.IncludeOrderProduct" Role="IncludeOrderProduct" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OrderReceipt">
+              <PropertyRef Name="OrderID" />
+            </Principal>
+            <Dependent Role="IncludeOrderProduct">
+              <PropertyRef Name="OrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FkIncludeOrderProducts_ProductID">
+          <End Type="SupplementFactsManagementModel.Product" Role="Product" Multiplicity="1" />
+          <End Type="SupplementFactsManagementModel.IncludeOrderProduct" Role="IncludeOrderProduct" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="ProductID" />
+            </Principal>
+            <Dependent Role="IncludeOrderProduct">
+              <PropertyRef Name="ProductID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="SupplementFactsManagementModelStoreContainer" CdmEntityContainer="DevConn">
+          <EntitySetMapping Name="IncludeImportedProducts">
+            <EntityTypeMapping TypeName="SupplementFactsManagementModel.IncludeImportedProduct">
+              <MappingFragment StoreEntitySet="IncludeImportedProducts">
+                <ScalarProperty Name="TotalProductQuantity" ColumnName="TotalProductQuantity" />
+                <ScalarProperty Name="TotalProductPrice" ColumnName="TotalProductPrice" />
+                <ScalarProperty Name="ReceiptID" ColumnName="ReceiptID" />
+                <ScalarProperty Name="ProductID" ColumnName="ProductID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Products">
+            <EntityTypeMapping TypeName="SupplementFactsManagementModel.Product">
+              <MappingFragment StoreEntitySet="Product">
+                <ScalarProperty Name="ProductID" ColumnName="ProductID" />
+                <ScalarProperty Name="ProductName" ColumnName="ProductName" />
+                <ScalarProperty Name="ProductPrice" ColumnName="ProductPrice" />
+                <ScalarProperty Name="ProductQuantity" ColumnName="ProductQuantity" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="WarehouseReceipts">
+            <EntityTypeMapping TypeName="SupplementFactsManagementModel.WarehouseReceipt">
+              <MappingFragment StoreEntitySet="WarehouseReceipt">
+                <ScalarProperty Name="ReceiptID" ColumnName="ReceiptID" />
+                <ScalarProperty Name="TotalWarehouseQuantity" ColumnName="TotalWarehouseQuantity" />
+                <ScalarProperty Name="TotalWarehousePrice" ColumnName="TotalWarehousePrice" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="spIncludeImportedProducts" FunctionName="SupplementFactsManagementModel.Store.spIncludeImportedProducts" />
+          <FunctionImportMapping FunctionImportName="spProductCreate" FunctionName="SupplementFactsManagementModel.Store.spProductCreate" />
+          <FunctionImportMapping FunctionImportName="spWarehouseReceipt" FunctionName="SupplementFactsManagementModel.Store.spWarehouseReceipt" />
+          <EntitySetMapping Name="Agents">
+            <EntityTypeMapping TypeName="SupplementFactsManagementModel.Agent">
+              <MappingFragment StoreEntitySet="Agent">
+                <ScalarProperty Name="AgentName" ColumnName="AgentName" />
+                <ScalarProperty Name="AgentID" ColumnName="AgentID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="IncludeOrderProducts">
+            <EntityTypeMapping TypeName="SupplementFactsManagementModel.IncludeOrderProduct">
+              <MappingFragment StoreEntitySet="IncludeOrderProducts">
+                <ScalarProperty Name="ProductID" ColumnName="ProductID" />
+                <ScalarProperty Name="OrderID" ColumnName="OrderID" />
+                <ScalarProperty Name="TotalProductPrice" ColumnName="TotalProductPrice" />
+                <ScalarProperty Name="TotalProductQuantity" ColumnName="TotalProductQuantity" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OrderReceipts">
+            <EntityTypeMapping TypeName="SupplementFactsManagementModel.OrderReceipt">
+              <MappingFragment StoreEntitySet="OrderReceipt">
+                <ScalarProperty Name="AgentID" ColumnName="AgentID" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="OrderedDate" ColumnName="OrderedDate" />
+                <ScalarProperty Name="TotalOrderQuantity" ColumnName="TotalOrderQuantity" />
+                <ScalarProperty Name="TotalOrderPrice" ColumnName="TotalOrderPrice" />
+                <ScalarProperty Name="OrderID" ColumnName="OrderID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
